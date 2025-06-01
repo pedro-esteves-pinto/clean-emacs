@@ -47,8 +47,8 @@
   :config (counsel-projectile-mode))
 
 (use-package consult-projectile
-  :after (consult projectile)
-  :config (consult-projectile-mode))
+  :after (consult projectile))
 
+(use-package magit)
 
 (global-set-key (kbd "C-x b") #'consult-buffer)
