@@ -11,29 +11,16 @@
 (load "config/misc")
 (load "config/mac")
 (load "config/buffer-management")
+(load "config/evil")
 
 (use-package doom-themes
   :config (load-theme 'doom-one t))
 
-;; Evil mode configuration (Vim keybindings)
-(use-package evil
-  :init
-  (setq evil-want-integration t)
-  (setq evil-want-keybinding nil)
-  :config
-  (evil-mode 1))
-
-(use-package evil-collection
-  :after evil
-  :config
-  (evil-collection-init))
-
 (use-package which-key
   :config (which-key-mode))
 
-
 (use-package magit)
 
-(global-set-key (kbd "C-x b") #'consult-projectile)
+(load "config/key-bindings")
 
 
