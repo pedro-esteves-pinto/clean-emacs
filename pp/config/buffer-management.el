@@ -8,7 +8,9 @@
 (use-package consult)
 
 (use-package projectile
-  :config (projectile-mode))
+  :config
+  (projectile-mode)
+  (setq projectile-enable-caching t))
 
 (use-package counsel-projectile
   :after (projectile counsel)
