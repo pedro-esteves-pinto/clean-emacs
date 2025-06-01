@@ -7,11 +7,12 @@
 
 (add-to-list 'load-path (expand-file-name "pp" user-emacs-directory))
 
-(load "config/straight")
-(load "config/misc")
-(load "config/mac")
-(load "config/buffer-management")
-(load "config/evil")
+(load "straight")
+(load "misc")
+(load "mac")
+(load "buffer-management")
+(load "evil")
+(load "key-bindings")
 
 (use-package doom-themes
   :config (load-theme 'doom-one t))
@@ -21,6 +22,5 @@
 
 (use-package magit)
 
-(load "config/key-bindings")
 
 

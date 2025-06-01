@@ -20,4 +20,5 @@
   :after (consult projectile)
   :config
   (dolist (src '(consult--source-buffer consult--source-bookmark))
-	       (add-to-list 'consult-projectile-sources src t)))
+    (add-to-list 'consult-projectile-sources src t))
+  (setq projectile-project-compilation-function #'pp-compile))
