@@ -4,19 +4,18 @@
 (menu-bar-mode -1)
 (tool-bar-mode -1)
 (scroll-bar-mode -1)
-(set-fringe-mode 10)
+(setq inhibit-startup-screen t)
 (setq frame-inhibit-implied-resize t)
+(setq inhibit-startup-message t)      ; no startup message in *scratch*
+(setq initial-scratch-message nil)    ; blank *scratch* buffer
+(setq inhibit-startup-echo-area-message user-login-name) ; no echo area message
+(setq package-enable-at-startup nil) ;; Don't auto-init packages (we use straight.el)
 
-;; Don't auto-init packages (we use straight.el)
-(setq package-enable-at-startup nil)
-
-;; Speed up startup with GC and file handler tweaks
+;; Speed up startup with GC and file handler tweaks These will be
+;; reverted back to defaults by a hook in init.el
 (setq gc-cons-threshold most-positive-fixnum
       gc-cons-percentage 0.6
       file-name-handler-alist-original file-name-handler-alist
       file-name-handler-alist nil)
-
-(provide 'early-init)
-;;; early-init.el ends here
 
 
