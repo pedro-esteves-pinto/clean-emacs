@@ -10,6 +10,7 @@
 (load "config/straight")
 (load "config/misc")
 (load "config/mac")
+(load "config/buffer-management")
 
 (use-package doom-themes
   :config (load-theme 'doom-one t))
@@ -30,25 +31,9 @@
 (use-package which-key
   :config (which-key-mode))
 
-(use-package vertico
-  :init (vertico-mode))
-
-(use-package orderless
-  :custom
-  (completion-styles '(orderless)))
-
-(use-package consult)
-
-(use-package projectile
-  :config (projectile-mode))
-
-(use-package counsel-projectile
-  :after (projectile counsel)
-  :config (counsel-projectile-mode))
-
-(use-package consult-projectile
-  :after (consult projectile))
 
 (use-package magit)
 
-(global-set-key (kbd "C-x b") #'consult-buffer)
+(global-set-key (kbd "C-x b") #'consult-projectile)
+
+
