@@ -4,7 +4,7 @@
 (evil-leader/set-leader "<SPC>")
 (evil-leader/set-key
   "<SPC>" 'consult-projectile
-  "b" 'projectile-compile-project
+  "b" 'pp-compile
   "m" 'magit-status)
 
 (global-set-key (read-kbd-macro "M-SPC") 'dabbrev-expand)

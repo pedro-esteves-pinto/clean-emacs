@@ -18,12 +18,16 @@
 	  ad-do-it))
     ad-do-it)) 
 
-(defun pp-compile (cmd)
-  (ad-activate 'compilation-start)
-  (compile cmd)
-  (if (not (get-buffer-window "*compilation*"))
-      (set-window-buffer (split-window (frame-root-window) -15) "*compilation*"))
-  (ad-deactivate 'compilation-start))
+(setq compilation-read-command nil)
+
+(defun pp-compile ()
+  (interactive "P")
+  (let* ((default-directory (projectile-project-root)))
+    (ad-activate 'compilation-start)
+    (compile)
+    (if (not (get-buffer-window "*compilation*"))
+	(set-window-buffer (split-window (frame-root-window) -15) "*compilation*"))
+    (ad-deactivate 'compilation-start)))
 
 (defun pp-next-error () 
   "Move point to next error and highlight it"
