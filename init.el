@@ -12,6 +12,7 @@
 (load "mac")
 (load "buffer-management")
 (load "evil")
+(load "compilation")
 (load "key-bindings")
 
 (use-package doom-themes
