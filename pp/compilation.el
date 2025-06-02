@@ -1,33 +1,28 @@
+(require 'cl-lib)
+
 (defun pp-compile-finish (buffer outstr)
-  (if (string-match "finished" outstr)
-      (delete-windows-on buffer)))
+  "Delete compilation window if compilation finished successfully."
+  (when (string-match "finished" outstr)
+    (delete-windows-on buffer)))
 
-(add-hook 'compilation-finish-functions 'pp-compile-finish)
-
-(defadvice compilation-start
-    (around inhibit-display
-	    (command &optional mode name-function highlight-regexp))
-  (if (not (string-match "^\\(find\\|grep\\|ag\\)" command))
-      (flet ((display-buffer)
-	     (set-window-point)
-	     (goto-char))
-	(fset 'display-buffer 'ignore)
-	(fset 'goto-char 'ignore)
-	(fset 'set-window-point 'ignore)
-	(save-window-excursion
-	  ad-do-it))
-    ad-do-it)) 
-
-(setq compilation-read-command nil)
+(add-hook 'compilation-finish-functions #'pp-compile-finish)
 
 (defun pp-compile ()
-  (interactive "P")
-  (let* ((default-directory (projectile-project-root)))
-    (ad-activate 'compilation-start)
-    (compile)
-    (if (not (get-buffer-window "*compilation*"))
-	(set-window-buffer (split-window (frame-root-window) -15) "*compilation*"))
-    (ad-deactivate 'compilation-start)))
+  "Run compile in projectile root, suppress showing compilation buffer unless it fails."
+  (interactive)
+  (let ((default-directory (projectile-project-root)))
+    ;; Temporarily override display-buffer to suppress popup
+    (cl-letf (((symbol-function 'display-buffer) #'ignore)
+              ((symbol-function 'goto-char) #'ignore)
+              ((symbol-function 'set-window-point) #'ignore))
+      (let ((compilation-buffer (compile compile-command)))
+	(run-at-time
+	 "0.1 sec" nil
+	 (lambda (buf)
+	   (unless (get-buffer-window buf)
+	     (set-window-buffer (split-window (frame-root-window) -15 'below)
+				buf)))
+	 compilation-buffer)))))
 
 (defun pp-next-error () 
   "Move point to next error and highlight it"
