@@ -7,13 +7,14 @@
 
 (add-to-list 'load-path (expand-file-name "pp" user-emacs-directory))
 
-(load "straight")
-(load "misc")
-(load "mac")
-(load "buffer-management")
-(load "evil")
-(load "compilation")
-(load "key-bindings")
+(load "pp/straight")
+(load "pp/misc")
+(load "pp/mac")
+(load "pp/buffer-management")
+(load "pp/evil")
+(load "pp/compilation")
+(load "pp/dired")
+(load "pp/key-bindings")
 
 (use-package doom-themes
   :config (load-theme 'doom-one t))

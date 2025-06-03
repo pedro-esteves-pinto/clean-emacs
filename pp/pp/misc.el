@@ -16,3 +16,5 @@
 ;; no more yes or no BS
 (defalias 'yes-or-no-p 'y-or-n-p) 
 
+;; move customize stuff to its own file
+(setq custom-file (expand-file-name "custom.el" user-emacs-directory))
