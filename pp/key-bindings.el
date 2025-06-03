@@ -9,5 +9,7 @@
 
 (global-set-key (read-kbd-macro "M-SPC") 'dabbrev-expand)
 (global-set-key (kbd "<f12>") 'consult-projectile)
+(global-set-key (kbd "M-e") 'pp-next-error)
+(global-set-key (kbd "M-E") 'pp-previous-error)
 
 (windmove-default-keybindings)
