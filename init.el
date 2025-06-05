@@ -14,6 +14,7 @@
 (load "pp/evil")
 (load "pp/compilation")
 (load "pp/dired")
+(load "pp/cpp")
 (load "pp/key-bindings")
 
 (use-package doom-themes
