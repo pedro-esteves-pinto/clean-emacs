@@ -1,4 +1,6 @@
+
 (require 'cl-lib)
+(provide 'pp-compilation)
 
 (defun pp-compile-finish (buffer outstr)
   "Delete compilation window if compilation finished successfully."
