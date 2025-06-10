@@ -17,6 +17,7 @@
   :config (which-key-mode))
 
 (use-package magit)
+(use-package vterm)
 
 (load "pp-misc")
 (load "pp-mac")

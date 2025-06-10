@@ -9,12 +9,12 @@
 (setq use-file-dialog nil) 
 ;; Disable re-center when scrolling
 (setq scroll-conservatively 9999) 
-;; Add a window margin when scrolling
 (setq scroll-margin 1) 
-;; word wrap on word boundaries
 (global-visual-line-mode t) 
-;; no more yes or no BS
 (defalias 'yes-or-no-p 'y-or-n-p) 
-
-;; move customize stuff to its own file
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
+(global-hl-line-mode)
+(setq window-combination-resize t) 
+
+(xterm-mouse-mode 1)
+(global-auto-revert-mode 1)
