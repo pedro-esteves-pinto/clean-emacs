@@ -1,3 +1,4 @@
+
 ;; restore slow settings at end of startup
 (add-hook 'emacs-startup-hook
           (lambda ()
@@ -18,6 +19,27 @@
 
 (use-package magit)
 (use-package vterm)
+
+(setq straight-built-in-pseudo-packages '(org))
+(straight-use-package 'org)
+
+(use-package org
+  :straight t
+  :config
+  (setq org-startup-indented t
+        org-hide-leading-stars t
+        org-ellipsis "…"))
+
+(straight-use-package 'org-modern)
+
+(use-package org-modern
+  :straight t
+  :hook ((org-mode . org-modern-mode)
+         (org-agenda-finalize . org-modern-agenda))
+  :config
+  (setq org-modern-star '("◉" "○" "✸" "✿")   ; Example pretty bullets
+        org-modern-hide-stars nil
+        org-modern-table nil))
 
 (load "pp-misc")
 (load "pp-mac")
