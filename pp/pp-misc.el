@@ -18,3 +18,15 @@
 
 (xterm-mouse-mode 1)
 (global-auto-revert-mode 1)
+
+(setq-default mode-line-format (list
+				" "
+				mode-line-modified " "
+				" %e %b "
+				" l:%1 c:%c %p           "
+				'(:eval (cond
+					 (( eq evil-state 'visual) "V")
+					 (( eq evil-state 'normal) "N")
+					 (( eq evil-state 'insert) "I")
+					 (t "*")))
+				))

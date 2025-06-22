@@ -1,6 +1,5 @@
 * TODO org mode setup
 - [ ] ctrl ret does not work
-* TODO more themes
 * TODO keybindings
 - tab doesn't work in normal mode
 - in shell mode switching between windows does not work very well
@@ -14,6 +13,6 @@
 - non jump mac text
 - non jump mac graphical 
 * TODO manage dir-locals in archer  
-      
- 
+
+
   

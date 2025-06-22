@@ -18,7 +18,13 @@
   :config (which-key-mode))
 
 (use-package magit)
-(use-package vterm)
+(use-package vterm
+  :config
+  (add-hook 'vterm-mode-hook
+	    (lambda ()
+	      (setq-local global-hl-line-mode nil) ; Disable global hl-line in vterm
+	      (hl-line-mode -1)))                 ; Disable buffer-local hl-line
+  )
 
 (setq straight-built-in-pseudo-packages '(org))
 (straight-use-package 'org)
