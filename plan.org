@@ -2,7 +2,7 @@
 - [ ] ctrl ret does not work
 * TODO keybindings
 - tab doesn't work in normal mode
-- in shell mode switching between windows does not work very well
+- [X] in shell mode switching between windows does not work very well
 * TODO figure out note taking
 - denote?
 * TODO manage secrets

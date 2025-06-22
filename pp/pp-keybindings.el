@@ -10,6 +10,8 @@
   "f" 'c-mark-function
   "v" 'ff-find-other-file
   ";" 'comment-dwim
+  "w" 'ace-window
+  "W" 'ace-swap-window
   "m" 'magit-status)
 
 (evil-leader/set-key
@@ -29,6 +31,13 @@
 (global-set-key (kbd "M-E") 'pp-previous-error)
 
 (windmove-default-keybindings)
+(defun my-vterm-setup-windmove ()
+  (define-key vterm-mode-map (kbd "S-<left>")  'windmove-left)
+  (define-key vterm-mode-map (kbd "S-<right>") 'windmove-right)
+  (define-key vterm-mode-map (kbd "S-<up>")    'windmove-up)
+  (define-key vterm-mode-map (kbd "S-<down>")  'windmove-down))
+
+(add-hook 'vterm-mode-hook #'my-vterm-setup-windmove)
 
 (require 'pp-compilation)
 

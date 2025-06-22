@@ -17,6 +17,10 @@
 (use-package which-key
   :config (which-key-mode))
 
+(use-package eglot
+  :config
+  (setq eglot-ignored-server-capabilities '(:hoverProvider :signatureHelpProvider)))
+
 (use-package magit)
 (use-package vterm
   :config
@@ -28,6 +32,8 @@
 
 (setq straight-built-in-pseudo-packages '(org))
 (straight-use-package 'org)
+(use-package ace-window)
+
 
 (use-package org
   :straight t
