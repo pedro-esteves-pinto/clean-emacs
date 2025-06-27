@@ -19,7 +19,7 @@
 
 (use-package eglot
   :config
-  (setq eglot-ignored-server-capabilities '(:hoverProvider :signatureHelpProvider)))
+  (setq eglot-ignored-server-capabilities '(:hoverProvider :signatureHelpProvider :inlayHintProvider)))
 
 (use-package magit)
 (use-package vterm
@@ -44,14 +44,6 @@
 
 (straight-use-package 'org-modern)
 
-(use-package org-modern
-  :straight t
-  :hook ((org-mode . org-modern-mode)
-         (org-agenda-finalize . org-modern-agenda))
-  :config
-  (setq org-modern-star '("◉" "○" "✸" "✿")   ; Example pretty bullets
-        org-modern-hide-stars nil
-        org-modern-table nil))
 
 (load "pp-misc")
 (load "pp-mac")
