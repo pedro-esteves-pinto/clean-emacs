@@ -1,4 +1,4 @@
-(provide 'pp-cpp-utils)
+(provide 'pp-cpp)
 
 (setq auto-mode-alist (cons '("\\.h\\'" . c++-mode) auto-mode-alist))
 (setq auto-mode-alist (cons '("\\.cc\\'" . c++-mode) auto-mode-alist))
@@ -18,14 +18,11 @@
   ;(company-mode 1)
   (font-lock-add-keywords 'c++-mode
 			  '(("foreach" . font-lock-keyword-face)
-			    ("nullptr" . font-lock-keyword-face)
 			    ("co_await" . font-lock-keyword-face)
 			    ("co_resume" . font-lock-keyword-face)
 			    ("co_return" . font-lock-keyword-face)
-			    ("co_yeld" . font-lock-keyword-face)
-			    ("constexpr" . font-lock-keyword-face)
-			    ("override" . font-lock-keyword-face)
-			    ))
+			    ("co_yield" . font-lock-keyword-face)
+			    			    ))
   )
 
 (add-hook 'c++-mode-hook (lambda () (pp-my-c++-setup)))

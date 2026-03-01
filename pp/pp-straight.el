@@ -16,4 +16,7 @@
 (straight-use-package 'use-package)
 (setq straight-use-package-by-default t)
 
-(provide 'straight-setup)
+;; Treat org as built-in to avoid version conflicts
+(setq straight-built-in-pseudo-packages '(org))
+
+(provide 'pp-straight)

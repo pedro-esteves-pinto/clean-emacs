@@ -13,7 +13,6 @@
 (global-visual-line-mode t) 
 (defalias 'yes-or-no-p 'y-or-n-p) 
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
-(global-hl-line-mode)
 (setq window-combination-resize t) 
 
 (xterm-mouse-mode 1)
@@ -23,10 +22,12 @@
 				" "
 				mode-line-modified " "
 				" %e %b "
-				" l:%1 c:%c %p           "
+				" l:%l c:%c %p"
 				'(:eval (cond
 					 (( eq evil-state 'visual) "V")
 					 (( eq evil-state 'normal) "N")
 					 (( eq evil-state 'insert) "I")
 					 (t "*")))
 				))
+
+(provide 'pp-misc)

@@ -13,9 +13,10 @@
 
 ;; Speed up startup with GC and file handler tweaks These will be
 ;; reverted back to defaults by a hook in init.el
+(defvar file-name-handler-alist-original file-name-handler-alist
+  "Original value of `file-name-handler-alist', restored after startup.")
 (setq gc-cons-threshold most-positive-fixnum
       gc-cons-percentage 0.6
-      file-name-handler-alist-original file-name-handler-alist
       file-name-handler-alist nil)
 
 

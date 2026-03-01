@@ -4,6 +4,8 @@
 	    (auto-revert-mode)
 	    (setq-default auto-revert-interval 1)
 	    (auto-revert-set-timer)))
-(setq dired—recursive—copies 'always)
-(setq dired—recursive—deletes 'always) 
+(setq dired-recursive-copies 'always)
+(setq dired-recursive-deletes 'always)
+
+(provide 'pp-dired)
 

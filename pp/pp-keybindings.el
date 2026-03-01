@@ -1,6 +1,4 @@
 
-(global-set-key (kbd "M-x") 'counsel-M-x)
-
 (evil-leader/set-leader "<SPC>")
 
 
@@ -22,8 +20,16 @@
   "lR" 'eglot-rename
   "lh" 'eldoc-print-current-symbol-info
   "lf" 'eglot-format
-  "lt" 'eglot-find-typeDefinition
-  )
+  "lt" 'eglot-find-typeDefinition)
+
+;; org-roam keybindings
+(evil-leader/set-key
+  "nf" 'org-roam-node-find
+  "ni" 'org-roam-node-insert
+  "nc" 'org-roam-capture
+  "nl" 'org-roam-buffer-toggle
+  "nd" 'org-roam-dailies-goto-today
+  "nD" 'org-roam-dailies-goto-date)
 (global-set-key (read-kbd-macro "M-SPC") 'dabbrev-expand)
 (global-set-key (kbd "<f12>") 'consult-projectile)
 (global-set-key (kbd "<f6>") 'display-line-numbers-mode)
@@ -48,3 +54,5 @@
   (define-key c-mode-base-map (kbd "M-E") 'pp-previous-error))
 
 ;(add-hook 'c++-mode-hook (lambda () (pp-c++-keybindings)))
+
+(provide 'pp-keybindings)

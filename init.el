@@ -21,7 +21,7 @@
   :config
   (setq eglot-ignored-server-capabilities '(:hoverProvider :signatureHelpProvider :inlayHintProvider)))
 
-(use-package magit)
+(use-package magit :defer t)
 (use-package vterm
   :config
   (add-hook 'vterm-mode-hook
@@ -30,19 +30,32 @@
 	      (hl-line-mode -1)))                 ; Disable buffer-local hl-line
   )
 
-(setq straight-built-in-pseudo-packages '(org))
 (straight-use-package 'org)
-(use-package ace-window)
+(use-package ace-window :defer t)
 
-
+(use-package rust-mode :defer t)
 (use-package org
   :straight t
   :config
-  (setq org-startup-indented t
+  (setq org-directory "~/Dropbox/notes"
+        org-startup-indented t
         org-hide-leading-stars t
-        org-ellipsis "…"))
+        org-ellipsis "…")
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((emacs-lisp . t)
+     (python . t))))
 
-(straight-use-package 'org-modern)
+(use-package org-modern
+  :hook (org-mode . org-modern-mode))
+
+(use-package org-roam
+  :defer t
+  :custom
+  (org-roam-directory (expand-file-name "roam" org-directory))
+  (org-roam-completion-everywhere t)
+  :config
+  (org-roam-db-autosync-mode))
 
 
 (load "pp-misc")
