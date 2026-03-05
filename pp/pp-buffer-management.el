@@ -15,7 +15,9 @@
 (use-package consult-projectile
   :after (consult projectile)
   :config
-  (dolist (src '(consult--source-buffer consult--source-bookmark))
+  ;; Include Consult's global buffers and bookmarks in the multiview.
+  ;; (Older configs used `consult--source-*' which got renamed.)
+  (dolist (src '(consult-source-buffer consult-source-bookmark))
     (add-to-list 'consult-projectile-sources src t))
   (setq projectile-project-compilation-function #'pp-compile))
 

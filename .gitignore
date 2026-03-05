@@ -10,3 +10,6 @@
 
 /elpa/
 /tramp
+/.org-id-locations
+/eln-cache/
+/org-roam.db

@@ -14,6 +14,15 @@
 (use-package doom-themes
   :config (load-theme 'doom-one t))
 
+;; Dim non-selected windows.
+(use-package dimmer
+  :config
+  (setq dimmer-fraction 0.35
+        dimmer-adjustment-mode :foreground)
+  (dimmer-configure-which-key)
+  (dimmer-configure-magit)
+  (dimmer-mode 1))
+
 (use-package which-key
   :config (which-key-mode))
 
@@ -34,6 +43,17 @@
 (use-package ace-window :defer t)
 
 (use-package rust-mode :defer t)
+
+(use-package markdown-mode
+  :mode (("README\\.md\\'" . gfm-mode)
+         ("\\.md\\'" . markdown-mode)
+         ("\\.markdown\\'" . markdown-mode))
+  :hook ((markdown-mode . visual-line-mode)
+         (gfm-mode . visual-line-mode))
+  :init
+  (setq markdown-fontify-code-blocks-natively t)
+  (when (executable-find "pandoc")
+    (setq markdown-command "pandoc")))
 (use-package org
   :straight t
   :config
