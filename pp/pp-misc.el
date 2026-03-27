@@ -32,13 +32,14 @@
 
 ;; Set smaller font on laptop displays (detected via eDP connector in sysfs).
 ;; Done in after-init-hook so it runs after themes have loaded and reset faces.
-(when (cl-some (lambda (dir)
-                 (string= (string-trim
-                           (with-temp-buffer
-                             (insert-file-contents (expand-file-name "status" dir))
-                             (buffer-string)))
-                          "connected"))
-               (directory-files "/sys/class/drm/" t "eDP"))
+(when (and (file-directory-p "/sys/class/drm/")
+           (cl-some (lambda (dir)
+                      (string= (string-trim
+                                (with-temp-buffer
+                                  (insert-file-contents (expand-file-name "status" dir))
+                                  (buffer-string)))
+                               "connected"))
+                    (directory-files "/sys/class/drm/" t "eDP")))
   (add-hook 'after-init-hook
             (lambda () (set-face-attribute 'default nil :height 90))))
 

@@ -1,4 +1,5 @@
-(setq dired-listing-switches "-lL --group-directories-first")
+(setq dired-listing-switches
+      (if (eq system-type 'darwin) "-lL" "-lL --group-directories-first"))
 (connection-local-set-profile-variables
  'remote-dired-profile
  '((dired-listing-switches . "-lL")))
