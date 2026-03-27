@@ -6,7 +6,7 @@
   "<SPC>" 'consult-projectile
   "b" 'pp-compile
   "g" 'revert-buffer
-  "f" 'c-mark-function
+  "f" 'projectile-grep
   "v" 'ff-find-other-file
   ";" 'comment-dwim
   "w" 'ace-window
@@ -32,7 +32,8 @@
   "nd" 'org-roam-dailies-goto-today
   "nD" 'org-roam-dailies-goto-date)
 
-(global-set-key (read-kbd-macro "M-SPC") 'dabbrev-expand)
+(global-set-key (read-kbd-macro "M-SPC") #'completion-at-point)
+(global-set-key (kbd "M-/") #'dabbrev-expand)
 (global-set-key (kbd "<f12>") 'consult-projectile)
 (global-set-key (kbd "<f6>") 'display-line-numbers-mode)
 (global-set-key (kbd "M-e") 'pp-next-error)
@@ -62,6 +63,18 @@
       (kbd "S-<right>") #'windmove-right
       (kbd "S-<up>")    #'windmove-up
       (kbd "S-<down>")  #'windmove-down))
+
+  ;; In Evil normal/motion state, make <up>/<down> behave like the terminal.
+  ;; This lets <up>/<down> traverse shell history even in normal mode.
+  (defun pp-vterm-arrow-up ()
+    (interactive)
+    (vterm-send-string "\e[A"))
+  (defun pp-vterm-arrow-down ()
+    (interactive)
+    (vterm-send-string "\e[B"))
+  (evil-define-key '(normal motion) vterm-mode-map
+    (kbd "<up>")   #'pp-vterm-arrow-up
+    (kbd "<down>") #'pp-vterm-arrow-down)
 
   ;; vterm grabs most keys, so mirror the global M-6/7/8 bindings here.
   (dolist (n '(6 7 8))

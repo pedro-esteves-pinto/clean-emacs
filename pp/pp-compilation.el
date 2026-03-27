@@ -17,6 +17,7 @@
     (cl-letf (((symbol-function 'display-buffer) #'ignore)
               ((symbol-function 'goto-char) #'ignore)
               ((symbol-function 'set-window-point) #'ignore))
+
       (let ((compilation-buffer (compile compile-command)))
 	(run-at-time
 	 "0.1 sec" nil
@@ -54,4 +55,3 @@
   (setq truncate-partial-width-windows nil))
 
 (add-hook 'compilation-mode-hook 'pp-compilation-mode-hook)
-

@@ -14,6 +14,19 @@
   (c-set-offset 'inline-open 0 nil)
   (setq indent-tabs-mode nil) ; Use spaces not tabs when indenting
   (eglot-ensure)
+  ;; Eglot uses Flymake for diagnostics.
+  ;; Prefer fringe indicators in GUI (avoid "!" in the margin) and disable
+  ;; indicators entirely in TTY.
+  (when (boundp 'flymake-indicator-type)
+    (setq-local flymake-indicator-type (if (display-graphic-p) 'fringes nil)))
+  ;; Avoid end-of-line diagnostic overlays.
+  (when (boundp 'flymake-show-diagnostics-at-end-of-line)
+    (setq-local flymake-show-diagnostics-at-end-of-line nil))
+  ;; Show diagnostics at point in the minibuffer (echo area).
+  (eldoc-mode 1)
+  (setq-local eldoc-display-functions '(eldoc-display-in-echo-area))
+  (when (fboundp 'flymake-eldoc-function)
+    (add-hook 'eldoc-documentation-functions #'flymake-eldoc-function nil t))
   (display-line-numbers-mode)
   ;(company-mode 1)
   (font-lock-add-keywords 'c++-mode

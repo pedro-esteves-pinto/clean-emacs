@@ -28,7 +28,7 @@
 
 (use-package eglot
   :config
-  (setq eglot-ignored-server-capabilities '(:hoverProvider :signatureHelpProvider :inlayHintProvider)))
+  (setq eglot-ignored-server-capabilities '(:hoverProvider :signatureHelpProvider :inlayHintProvider :documentHighlightProvider :semanticTokensProvider)))
 
 (use-package magit :defer t)
 (use-package vterm
