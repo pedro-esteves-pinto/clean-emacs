@@ -77,7 +77,6 @@
   :config
   (org-roam-db-autosync-mode))
 
-
 (load "pp-misc")
 (load "pp-mac")
 (load "pp-buffer-management")
@@ -85,4 +84,5 @@
 (load "pp-compilation")
 (load "pp-dired")
 (load "pp-cpp")
+(load "pp-journal")
 (load "pp-keybindings")

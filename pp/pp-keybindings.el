@@ -8,6 +8,7 @@
   "g" 'revert-buffer
   "f" 'projectile-grep
   "v" 'ff-find-other-file
+  "j" 'avy-goto-char-2
   ";" 'comment-dwim
   "w" 'ace-window
   "W" 'ace-swap-window
@@ -30,7 +31,8 @@
   "nc" 'org-roam-capture
   "nl" 'org-roam-buffer-toggle
   "nd" 'org-roam-dailies-goto-today
-  "nD" 'org-roam-dailies-goto-date)
+  "nD" 'org-roam-dailies-goto-date
+  "nj" 'pp-journal-capture)
 
 (global-set-key (read-kbd-macro "M-SPC") #'completion-at-point)
 (global-set-key (kbd "M-/") #'dabbrev-expand)
