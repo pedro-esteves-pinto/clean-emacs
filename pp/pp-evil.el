@@ -17,4 +17,5 @@
 (use-package evil-collection
   :after evil
   :config
-  (evil-collection-init))
+  (evil-collection-init)
+  (evil-define-key 'normal org-mode-map (kbd "RET") #'org-open-at-point))

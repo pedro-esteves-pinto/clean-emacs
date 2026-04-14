@@ -10,12 +10,13 @@
 ;; Disable re-center when scrolling
 (setq scroll-conservatively 9999) 
 (setq scroll-margin 1) 
-(global-visual-line-mode t) 
+(global-visual-line-mode t)
 (defalias 'yes-or-no-p 'y-or-n-p) 
 (setq custom-file (expand-file-name "custom.el" user-emacs-directory))
 (setq window-combination-resize t) 
 
 (xterm-mouse-mode 1)
+(setq revert-without-query '(".*"))
 (global-auto-revert-mode 1)
 
 (setq-default mode-line-format (list
@@ -42,5 +43,21 @@
                     (directory-files "/sys/class/drm/" t "eDP")))
   (add-hook 'after-init-hook
             (lambda () (set-face-attribute 'default nil :height 90))))
+
+;; Fonts — uncomment one to use
+;; (set-face-attribute 'default nil :family "JetBrainsMono Nerd Font" :height 120)
+;; (set-face-attribute 'default nil :family "Fira Code" :height 120)
+;; (set-face-attribute 'default nil :family "Cascadia Code" :height 120)
+;; (set-face-attribute 'default nil :family "VictorMono Nerd Font" :height 120)
+;; (set-face-attribute 'default nil :family "Source Code Pro" :height 120)
+;(set-face-attribute 'default nil :family "Hack" :height 120)
+;; (set-face-attribute 'default nil :family "Monaspace Neon" :height 120)
+;; (set-face-attribute 'default nil :family "Monaspace Argon" :height 120)
+;; (set-face-attribute 'default nil :family "Monaspace Xenon" :height 120)
+;; (set-face-attribute 'default nil :family "Monaspace Radon" :height 120)
+;; (set-face-attribute 'default nil :family "Monaspace Krypton" :height 120)
+;; (set-face-attribute 'default nil :family "Geist Mono" :height 120)
+;; (set-face-attribute 'default nil :family "iA Writer Mono S" :height 120)
+;; (set-face-attribute 'default nil :family "Noto Sans Mono" :height 120)
 
 (provide 'pp-misc)

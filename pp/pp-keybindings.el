@@ -40,6 +40,14 @@
 (global-set-key (kbd "<f6>") 'display-line-numbers-mode)
 (global-set-key (kbd "M-e") 'pp-next-error)
 (global-set-key (kbd "M-E") 'pp-previous-error)
+(global-set-key (kbd "M-1") 'delete-other-windows)
+(global-set-key (kbd "M-2") 'split-window-vertically)
+(global-set-key (kbd "M-3") 'split-window-horizontally)
+(global-set-key (kbd "M-0") 'delete-window)
+(global-set-key (kbd "M-=") 'balance-windows)
+(global-set-key (kbd "C-+") 'text-scale-increase)
+(global-set-key (kbd "C--") 'text-scale-decrease)
+(global-set-key (kbd "C-0") 'text-scale-adjust)
 
 (defun my-vterm-goto (n)
   "Switch to vterm-N, creating it if needed."

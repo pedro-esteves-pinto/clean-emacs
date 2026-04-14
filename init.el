@@ -8,11 +8,10 @@
 
 (add-to-list 'load-path (expand-file-name "pp" user-emacs-directory))
 
-
 (load "pp-straight")
 
 (use-package doom-themes
-  :config (load-theme 'doom-one t))
+  :config (load-theme 'doom-tokyo-night t))
 
 ;; Dim non-selected windows.
 (use-package dimmer
@@ -51,16 +50,18 @@
   :hook ((markdown-mode . visual-line-mode)
          (gfm-mode . visual-line-mode))
   :init
-  (setq markdown-fontify-code-blocks-natively t)
+  (setq markdown-fontify-code-blocks-natively t
+        markdown-hide-markup t)
   (when (executable-find "pandoc")
-    (setq markdown-command "pandoc")))
+    (setq markdown-command "pandoc -f markdown -t html5 --standalone")))
 (use-package org
   :straight t
   :config
   (setq org-directory "~/Dropbox/notes"
         org-startup-indented t
         org-hide-leading-stars t
-        org-ellipsis "…")
+        org-ellipsis "…"
+        org-return-follows-link t)
   (org-babel-do-load-languages
    'org-babel-load-languages
    '((emacs-lisp . t)
@@ -84,5 +85,6 @@
 (load "pp-compilation")
 (load "pp-dired")
 (load "pp-cpp")
+(load "pp-python")
 (load "pp-journal")
 (load "pp-keybindings")
