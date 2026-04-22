@@ -18,4 +18,5 @@
   :after evil
   :config
   (evil-collection-init)
-  (evil-define-key 'normal org-mode-map (kbd "RET") #'org-open-at-point))
+  (evil-define-key 'normal org-mode-map (kbd "RET") #'org-open-at-point)
+  (evil-define-key '(normal insert) org-mode-map (kbd "TAB") #'org-cycle))

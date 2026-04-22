@@ -24,6 +24,50 @@
   "lf" 'eglot-format
   "lt" 'eglot-find-typeDefinition)
 
+(defun pp-tab-new ()
+  "Create a new tab named after the current project root and open dired there."
+  (interactive)
+  (let* ((proj (project-current))
+         (root (if proj (project-root proj) default-directory))
+         (name (file-name-nondirectory (directory-file-name root)))
+         (tab-bar-new-tab-to 'rightmost))
+    (tab-bar-new-tab)
+    (tab-bar-rename-tab name)
+    (dired root)))
+
+;; tab-bar keybindings
+(evil-leader/set-key
+  "tt" 'tab-bar-switch-to-tab
+  "tc" 'pp-tab-new
+  "tn" 'tab-bar-switch-to-next-tab
+  "tp" 'tab-bar-switch-to-prev-tab
+  "tr" 'tab-bar-rename-tab
+  "tu" 'tab-bar-undo-close-tab
+  "tx" 'tab-bar-close-tab)
+
+;; markdown keybindings
+(evil-leader/set-key
+  "dp" 'markdown-preview
+  "de" 'markdown-export
+  "do" 'markdown-open
+  "dl" 'markdown-insert-link
+  "di" 'markdown-insert-image
+  "dh" 'markdown-insert-header-dwim
+  "d1" 'markdown-insert-header-atx-1
+  "d2" 'markdown-insert-header-atx-2
+  "d3" 'markdown-insert-header-atx-3
+  "db" 'markdown-insert-bold
+  "d/" 'markdown-insert-italic
+  "dc" 'markdown-insert-code
+  "dC" 'markdown-insert-gfm-code-block
+  "d-" 'markdown-insert-hr
+  "dt" 'markdown-insert-table
+  "dk" 'markdown-insert-gfm-checkbox
+  "dn" 'markdown-move-down
+  "dN" 'markdown-move-up
+  "dm" 'markdown-toggle-markup-hiding
+  "df" 'markdown-follow-thing-at-point)
+
 ;; org-roam keybindings
 (evil-leader/set-key
   "nf" 'org-roam-node-find
@@ -58,6 +102,31 @@
       (let ((vterm-buffer-name name))
         (vterm)))))
 
+(defun pp-vterm-for-project ()
+  "Open or switch to a vterm named after the current project root.
+If a buffer with that name already exists, switch to it.
+Otherwise create a new vterm with that name.  When the base name
+is already taken by a non-vterm buffer, uniquify with <N>."
+  (interactive)
+  (let* ((root (or (projectile-project-root)
+                   default-directory))
+         (base (file-name-nondirectory (directory-file-name root)))
+         (name (generate-new-buffer-name base))
+         ;; Reuse existing vterm buffer whose name starts with base
+         (existing (cl-find-if
+                    (lambda (b)
+                      (and (string-prefix-p base (buffer-name b))
+                           (with-current-buffer b
+                             (derived-mode-p 'vterm-mode))))
+                    (buffer-list))))
+    (if existing
+        (pop-to-buffer existing)
+      (let ((default-directory root)
+            (vterm-buffer-name name))
+        (vterm)))))
+
+(global-set-key (kbd "C-c C-t") #'pp-vterm-for-project)
+
 (dolist (n '(6 7 8))
   (global-set-key
    (kbd (format "M-%d" n))
@@ -66,6 +135,7 @@
       (my-vterm-goto ,n))))
 
 (windmove-default-keybindings)
+(windmove-swap-states-default-keybindings '(meta shift))
 (with-eval-after-load 'vterm
   (dolist (state '(insert emacs))
     (evil-define-key state vterm-mode-map

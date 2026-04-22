@@ -1,9 +1,16 @@
 (provide 'pp-python)
 
+(defun pp/pyright-langserver (_interactive _managed-mode)
+  "Return pyright-langserver from project .venv if it exists, else fallback."
+  (let* ((root (project-root (project-current)))
+         (venv-bin (expand-file-name ".venv/bin/pyright-langserver" root)))
+    (if (file-executable-p venv-bin)
+        (list venv-bin "--stdio")
+      '("pyright-langserver" "--stdio"))))
+
 (with-eval-after-load 'eglot
   (add-to-list 'eglot-server-programs
-               '((python-mode python-ts-mode)
-                 "pyright-langserver" "--stdio")))
+               '((python-mode python-ts-mode) . pp/pyright-langserver)))
 
 (defun pp-my-python-setup ()
   "Changes to the default Python setup."

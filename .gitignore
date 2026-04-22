@@ -8,6 +8,7 @@
 /.custom
 /custom.el
 
+/pp/pp-connections.el
 /elpa/
 /tramp
 /.org-id-locations
