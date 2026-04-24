@@ -38,6 +38,8 @@
 	      (setq-local global-hl-line-mode nil) ; Disable global hl-line in vterm
 	      (hl-line-mode -1)))                 ; Disable buffer-local hl-line
 
+  (define-key vterm-mode-map (kbd "C-c <escape>") #'vterm-send-escape)
+
   ;; Dim inactive vterm windows using overlays.
   ;; face-remap can't affect vterm because vterm sets explicit face
   ;; text-properties on each character.  Overlay faces take precedence
@@ -118,4 +120,5 @@
 (load "pp-cpp")
 (load "pp-python")
 (load "pp-journal")
+(load "pp-feature")
 (load "pp-keybindings")

@@ -21,12 +21,18 @@
   (projectile-mode)
   (setq projectile-enable-caching t))
 
+;; Tab-scoped buffer lists. With `bufferlo-mode' on, `consult-buffer',
+;; `switch-to-buffer', and friends only offer buffers belonging to the current
+;; tab — that's what keeps feature tabs from cross-contaminating.
+(use-package bufferlo
+  :init (bufferlo-mode))
+
 (use-package consult-projectile
   :after (consult projectile)
   :config
-  ;; Include Consult's global buffers and bookmarks in the multiview.
-  (dolist (src '(consult-source-buffer consult-source-bookmark))
-    (add-to-list 'consult-projectile-sources src t))
+  ;; Deliberately NOT adding `consult-source-buffer' here: it's a global source
+  ;; and would leak buffers from other feature tabs into this tab's picker.
+  (add-to-list 'consult-projectile-sources 'consult-source-bookmark t)
   (setq projectile-project-compilation-function #'pp-compile))
 
 (provide 'pp-buffer-management)

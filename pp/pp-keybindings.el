@@ -45,6 +45,16 @@
   "tu" 'tab-bar-undo-close-tab
   "tx" 'tab-bar-close-tab)
 
+;; feature (worktree + tab + claude) keybindings
+(evil-leader/set-key
+  "Fn" 'pp-feature-new
+  "Fi" 'pp-feature-create-issue
+  "Ff" 'pp-feature-switch
+  "Fc" 'pp-feature-claude
+  "Ft" 'pp-feature-vterm
+  "Fd" 'pp-feature-dired
+  "Fx" 'pp-feature-close)
+
 ;; markdown keybindings
 (evil-leader/set-key
   "dp" 'markdown-preview
