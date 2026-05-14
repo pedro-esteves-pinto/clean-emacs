@@ -146,4 +146,5 @@
 (load "pp-journal")
 (load "pp-dedicated-windows")
 (load "pp-feature")
+(load "pp-repo-tab")
 (load "pp-keybindings")

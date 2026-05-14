@@ -55,6 +55,10 @@
   "Fd" 'pp-feature-dired
   "Fx" 'pp-feature-close)
 
+;; repo-tab keybindings (dedicated layout for an arbitrary directory)
+(evil-leader/set-key
+  "Ro" 'pp-repo-open-tab)
+
 (defun pp-copy-buffer-file-path ()
   "Copy the current buffer's file path to the clipboard.
 If the buffer is not visiting a file, copy `default-directory' instead."
