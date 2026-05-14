@@ -28,9 +28,27 @@
 
 (use-package eglot
   :config
-  (setq eglot-ignored-server-capabilities '(:hoverProvider :signatureHelpProvider :inlayHintProvider :documentHighlightProvider :semanticTokensProvider)))
+  (setq eglot-ignored-server-capabilities '(:hoverProvider :signatureHelpProvider :inlayHintProvider :documentHighlightProvider :semanticTokensProvider))
+  ;; Show flymake diagnostic message in the echo area when point is on a squiggle.
+  (setq eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly))
 
-(use-package magit :defer t)
+(use-package magit
+  :defer t
+  :config
+  (defun pp-magit-toggle-full-file-diff ()
+    "Toggle full-file diff context (-U9999) in the current magit buffer."
+    (interactive)
+    (unless (bound-and-true-p magit-buffer-diff-args)
+      (user-error "No diff args in this buffer (try magit-status or magit-diff)"))
+    (let* ((args magit-buffer-diff-args)
+           (full (member "-U9999" args))
+           (cleaned (cl-remove-if (lambda (a) (string-prefix-p "-U" a)) args)))
+      (setq magit-buffer-diff-args
+            (if full cleaned (cons "-U9999" cleaned))))
+    (magit-refresh)
+    (message "magit diff context: %s"
+             (if (member "-U9999" magit-buffer-diff-args) "full file" "default"))))
+
 (use-package vterm
   :config
   (add-hook 'vterm-mode-hook
@@ -69,6 +87,12 @@
   (add-hook 'window-selection-change-functions
             (lambda (_frame) (pp/vterm-dim-inactive)))
   )
+
+(use-package claude-code
+  :straight (:type git :host github :repo "stevemolitor/claude-code.el"
+             :files ("*.el" (:exclude "demo.gif")))
+  :custom (claude-code-terminal-backend 'vterm)
+  :config (claude-code-mode))
 
 (straight-use-package 'org)
 (use-package ace-window :defer t)
@@ -120,5 +144,6 @@
 (load "pp-cpp")
 (load "pp-python")
 (load "pp-journal")
+(load "pp-dedicated-windows")
 (load "pp-feature")
 (load "pp-keybindings")

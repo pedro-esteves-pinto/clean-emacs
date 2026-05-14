@@ -55,9 +55,27 @@
   "Fd" 'pp-feature-dired
   "Fx" 'pp-feature-close)
 
+(defun pp-copy-buffer-file-path ()
+  "Copy the current buffer's file path to the clipboard.
+If the buffer is not visiting a file, copy `default-directory' instead."
+  (interactive)
+  (let ((path (or (buffer-file-name) default-directory)))
+    (kill-new path)
+    (message "Copied: %s" path)))
+
+(evil-leader/set-key
+  "up" 'pp-copy-buffer-file-path)
+
+(defun pp-markdown-xdg-open ()
+  "Open the current buffer's markdown file with the system default handler."
+  (interactive)
+  (unless buffer-file-name
+    (user-error "Buffer is not visiting a file"))
+  (call-process "xdg-open" nil 0 nil buffer-file-name))
+
 ;; markdown keybindings
 (evil-leader/set-key
-  "dp" 'markdown-preview
+  "dp" 'pp-markdown-xdg-open
   "de" 'markdown-export
   "do" 'markdown-open
   "dl" 'markdown-insert-link
@@ -146,6 +164,9 @@ is already taken by a non-vterm buffer, uniquify with <N>."
 
 (windmove-default-keybindings)
 (windmove-swap-states-default-keybindings '(meta shift))
+(with-eval-after-load 'magit
+  (define-key magit-mode-map (kbd "C-c +") #'pp-magit-toggle-full-file-diff))
+
 (with-eval-after-load 'vterm
   (dolist (state '(insert emacs))
     (evil-define-key state vterm-mode-map

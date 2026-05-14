@@ -3,6 +3,7 @@
 (require 'cl-lib)
 (require 'tab-bar)
 (require 'dired)
+(require 'pp-dedicated-windows)
 
 ;; Forward declarations for vterm (loaded lazily in `pp-feature--make-claude').
 ;; The defvar is load-bearing under lexical-binding: without it, the `let'
@@ -113,29 +114,42 @@ When STARTUP-COMMAND is non-nil, send it + RET after the shell starts."
                           "claude"))
 
 (defun pp-feature--open-tab (feature)
-  "Create a new tab for FEATURE.
-Layout: dired on the left, claude (top) and vterm (bottom) stacked on the right.
+  "Create a new tab for FEATURE using the dedicated A/B/C layout.
+A (top-left) = claude, B (bottom-left) = vterm, C (right) = dired.
 Focus is left on the dired window."
   (let ((root (pp-feature--worktree-path feature))
         (tab-bar-new-tab-to 'rightmost))
     (tab-bar-new-tab)
     (tab-bar-rename-tab feature)
-    (delete-other-windows)
-    (dired root)
-    (let* ((w-dired (selected-window))
-           (w-right-top (split-window-right))
-           (w-right-bottom (with-selected-window w-right-top
-                             (split-window-below))))
-      (with-selected-window w-right-top
-        (pp-feature--make-claude feature))
-      (with-selected-window w-right-bottom
-        (pp-feature--make-vterm feature
-                                (pp-feature--vterm-buffer-name feature)))
-      (select-window w-dired))))
+    ;; The new tab inherits dedication and `no-delete-other-windows' from the
+    ;; previous tab's A-slot, which makes tab-bar's internal switch-to-buffer
+    ;; fall through to `pop-to-buffer' and silently split the frame.  Scrub
+    ;; that state so the layout builder starts from a clean single window.
+    (dolist (w (window-list nil 'no-mini))
+      (set-window-dedicated-p w nil)
+      (set-window-parameter w 'no-delete-other-windows nil)
+      (set-window-parameter w 'pp-slot nil))
+    (let ((ignore-window-parameters t))
+      (delete-other-windows))
+    (switch-to-buffer (get-scratch-buffer-create))
+    ;; Spawn the claude and vterm buffers off-screen so we can hand live
+    ;; buffers to the layout builder.  `save-window-excursion' keeps `vterm''s
+    ;; switch-to-buffer side effect from clobbering the soon-to-be layout.
+    (save-window-excursion (pp-feature--make-claude feature))
+    (save-window-excursion
+      (pp-feature--make-vterm feature
+                              (pp-feature--vterm-buffer-name feature)))
+    (pp-dedicated-windows-build
+     (get-buffer (pp-feature--claude-buffer-name feature))
+     (get-buffer (pp-feature--vterm-buffer-name feature)))
+    (dired root)))
 
 ;;;###autoload
 (defun pp-feature-new (project issue)
-  "Create a worktree for PROJECT and ISSUE, then open it in a tab."
+  "Create a worktree for PROJECT and ISSUE, then open it in a tab.
+If ISSUE already has an open PR linked to it (via Closes/Fixes) in PROJECT's
+repo, the worktree is checked out from that PR's branch instead of a fresh
+branch off `dev'. Detection happens inside `pp-feature-script'."
   (interactive
    (list (completing-read "Project: " '("frontend" "backend") nil t)
          (read-string "Issue number: ")))
@@ -180,6 +194,7 @@ the same worktree/tab flow as `pp-feature-new' on the resulting issue."
     (unless repo (user-error "Unknown project: %s" project))
     (unless (executable-find "gh")
       (user-error "gh CLI not found on PATH"))
+    (pp-feature--check-gh-scopes)
     (let* ((buf-name (format "*create-issue: %s*" project))
            (buf (get-buffer-create buf-name)))
       (with-current-buffer buf
@@ -201,12 +216,42 @@ the same worktree/tab flow as `pp-feature-new' on the resulting issue."
       (insert line)
       (unless (bolp) (insert "\n")))))
 
+(defun pp-feature--last-error-line (buf)
+  "Return the last `error: ...' line in BUF, or nil."
+  (with-current-buffer buf
+    (save-excursion
+      (goto-char (point-max))
+      (when (re-search-backward "^error: .*$" nil t)
+        (match-string-no-properties 0)))))
+
+(defun pp-feature--proc-error-suffix (proc)
+  "Format the tail of a failure `message' for PROC.
+Surfaces the last `error:' line from gh when present, instead of forcing the
+user to dig through the process buffer."
+  (let ((err (pp-feature--last-error-line (process-buffer proc))))
+    (if err
+        (concat ": " err)
+      (format "; see %s" (buffer-name (process-buffer proc))))))
+
+(defun pp-feature--check-gh-scopes ()
+  "Signal a `user-error' if gh's token is missing the `project' scope.
+The post-issue chain (`gh project item-add' / `item-edit') needs it; without
+it the chain dies after issue creation, leaving an orphan issue and no tab."
+  (let ((output (shell-command-to-string "gh auth status 2>&1")))
+    (cond
+     ((string-match "Token scopes:[^\n]*\\bproject\\b" output) t)
+     ((string-match "Token scopes:" output)
+      (user-error
+       "gh token missing `project' scope — run: gh auth refresh -s project"))
+     (t
+      (user-error "gh auth status failed:\n%s" (string-trim output))))))
+
 (defun pp-feature--issue-create-sentinel (proc _event)
   (when (memq (process-status proc) '(exit signal))
     (if (/= 0 (process-exit-status proc))
-        (message "gh issue create failed (exit %d); see %s"
+        (message "gh issue create failed (exit %d)%s"
                  (process-exit-status proc)
-                 (buffer-name (process-buffer proc)))
+                 (pp-feature--proc-error-suffix proc))
       (let* ((buf (process-buffer proc))
              (out (with-current-buffer buf (buffer-string)))
              (url (and (string-match
@@ -238,19 +283,23 @@ the same worktree/tab flow as `pp-feature-new' on the resulting issue."
 
 (defun pp-feature--project-add-sentinel (proc _event)
   (when (memq (process-status proc) '(exit signal))
-    (if (/= 0 (process-exit-status proc))
-        (message "gh project item-add failed (exit %d); see %s"
+    (let ((project (process-get proc 'pp-feature-project))
+          (issue (process-get proc 'pp-feature-issue)))
+      (cond
+       ((/= 0 (process-exit-status proc))
+        (message "gh project item-add failed (exit %d)%s — proceeding with worktree"
                  (process-exit-status proc)
-                 (buffer-name (process-buffer proc)))
-      (let* ((buf (process-buffer proc))
-             (out (with-current-buffer buf (buffer-string)))
-             (item-id (and (string-match "\\(PVTI_[A-Za-z0-9_-]+\\)" out)
-                           (match-string 1 out)))
-             (project (process-get proc 'pp-feature-project))
-             (issue (process-get proc 'pp-feature-issue)))
-        (if item-id
-            (pp-feature--project-set-status buf project issue item-id)
-          (message "Added to project but could not parse item id"))))))
+                 (pp-feature--proc-error-suffix proc))
+        (pp-feature-new project issue))
+       (t
+        (let* ((buf (process-buffer proc))
+               (out (with-current-buffer buf (buffer-string)))
+               (item-id (and (string-match "\\(PVTI_[A-Za-z0-9_-]+\\)" out)
+                             (match-string 1 out))))
+          (if item-id
+              (pp-feature--project-set-status buf project issue item-id)
+            (message "Added to project but could not parse item id — proceeding with worktree")
+            (pp-feature-new project issue))))))))
 
 (defun pp-feature--project-set-status (buf project issue item-id)
   (pp-feature--append-buf
@@ -268,13 +317,13 @@ the same worktree/tab flow as `pp-feature-new' on the resulting issue."
 
 (defun pp-feature--project-status-sentinel (proc _event)
   (when (memq (process-status proc) '(exit signal))
-    (if (/= 0 (process-exit-status proc))
-        (message "gh project item-edit failed (exit %d); see %s"
+    (let ((project (process-get proc 'pp-feature-project))
+          (issue (process-get proc 'pp-feature-issue)))
+      (when (/= 0 (process-exit-status proc))
+        (message "gh project item-edit failed (exit %d)%s — proceeding with worktree"
                  (process-exit-status proc)
-                 (buffer-name (process-buffer proc)))
-      (let ((project (process-get proc 'pp-feature-project))
-            (issue (process-get proc 'pp-feature-issue)))
-        (pp-feature-new project issue)))))
+                 (pp-feature--proc-error-suffix proc)))
+      (pp-feature-new project issue))))
 
 ;;;###autoload
 (defun pp-feature-switch (feature)
@@ -290,40 +339,46 @@ the same worktree/tab flow as `pp-feature-new' on the resulting issue."
         (user-error "Worktree does not exist: %s" path))
       (pp-feature--open-tab feature))))
 
-(defun pp-feature--pop-or-create-vterm (name factory)
-  "Pop to NAME if it exists, otherwise call FACTORY (a thunk) to create it."
-  (let ((existing (get-buffer name)))
-    (if (buffer-live-p existing)
-        (pop-to-buffer existing)
-      (funcall factory))))
+(defun pp-feature--focus-dedicated-slot (slot factory)
+  "Focus SLOT (A or B), running FACTORY (a thunk) first if its buffer is gone.
+FACTORY is expected to create the buffer that SLOT should host."
+  (let ((win (pp-dedicated-windows-window slot)))
+    (unless win (user-error "Dedicated window layout not present in this tab"))
+    (let* ((buffer (window-buffer win)))
+      (unless (buffer-live-p buffer)
+        (save-window-excursion (funcall factory))
+        ;; The factory has created a fresh buffer; re-seat it in the slot.
+        (pp-dedicated-windows-set-buffer
+         slot (window-buffer (selected-window)))))
+    (pp-dedicated-windows-select slot)))
 
 ;;;###autoload
 (defun pp-feature-claude ()
-  "Pop to this tab's claude vterm, creating it if missing."
+  "Focus this tab's claude window (slot A)."
   (interactive)
   (let ((feature (pp-feature--current-feature)))
     (unless feature (user-error "Not in a feature tab"))
-    (pp-feature--pop-or-create-vterm
-     (pp-feature--claude-buffer-name feature)
-     (lambda () (pp-feature--make-claude feature)))))
+    (pp-feature--focus-dedicated-slot
+     'A (lambda () (pp-feature--make-claude feature)))))
 
 ;;;###autoload
 (defun pp-feature-vterm ()
-  "Pop to this tab's shell vterm, creating it if missing."
+  "Focus this tab's shell vterm window (slot B)."
   (interactive)
   (let ((feature (pp-feature--current-feature)))
     (unless feature (user-error "Not in a feature tab"))
-    (let ((name (pp-feature--vterm-buffer-name feature)))
-      (pp-feature--pop-or-create-vterm
-       name
-       (lambda () (pp-feature--make-vterm feature name))))))
+    (pp-feature--focus-dedicated-slot
+     'B (lambda ()
+          (pp-feature--make-vterm feature
+                                  (pp-feature--vterm-buffer-name feature))))))
 
 ;;;###autoload
 (defun pp-feature-dired ()
-  "Open a dired buffer at the root of the current feature's worktree."
+  "Open a dired buffer at the feature's worktree root in slot C."
   (interactive)
   (let ((feature (pp-feature--current-feature)))
     (unless feature (user-error "Not in a feature tab"))
+    (pp-dedicated-windows-select 'C)
     (dired (pp-feature--worktree-path feature))))
 
 ;;;###autoload

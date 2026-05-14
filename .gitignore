@@ -14,3 +14,4 @@
 /.org-id-locations
 /eln-cache/
 /org-roam.db
+*.elc
