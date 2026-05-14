@@ -22,7 +22,13 @@
 	(run-at-time
 	 "0.1 sec" nil
 	 (lambda (buf)
-	   (unless (get-buffer-window buf)
+	   ;; Only pop a window if the build is still running. Otherwise the
+	   ;; compilation-finish hook has already fired (and tried to close
+	   ;; a window that didn't exist yet), and opening one now would
+	   ;; leave a stale buffer visible — happens on no-op ninja builds.
+	   (when (and (buffer-live-p buf)
+		      (process-live-p (get-buffer-process buf))
+		      (not (get-buffer-window buf)))
 	     (set-window-buffer (split-window (frame-root-window) -15 'below)
 				buf)))
 	 compilation-buffer)))))
